@@ -10,8 +10,7 @@
 
 
 (defn odd-numbers []
-  (drop 1 (filter odd? (range))))
-
+  (lazy-seq (drop 1 (filter odd? (range)))))
 
 ;; 3 7 11 15 ... -> 0
 ;; 5 9 13 17 ... -> 1
@@ -21,7 +20,7 @@
         :else 1))
 ;;
 (defn direction []
-  (lazy-seq (mapcat #(take % (repeat (fn-direction %))) (odd-numbers))))
+  (lazy-seq (mapcat #(take % (repeat (fn-direction %))) (take 20 (odd-numbers)))))
 
 (defn squares [n]
   (let [m (* n (bigint n))]
@@ -55,7 +54,6 @@
 ;; res = [[1][2 4][1 6 *][* *][*]]
 ;;
 (defn do-res [m]
-  (println m)
   (let [item (first (:seq m))
         curr-line (first (:line m))
         curr-dir (first (:dir m))
@@ -71,14 +69,15 @@
           :else (conj curr-res [item]))))
 
 (defn do-draw [m]
+  (println m)
   (let [new-seq (drop 1 (:seq m))
         new-line (drop 1 (:line m))
         new-dir (drop 1 (:dir m))]
     (cond (empty? (:seq m)) (:res m)
-          (empty? (:res m)) (hash-map :seq new-seq
-                                      :line new-line
-                                      :dir new-dir
-                                      :res [[(str (first (:seq m)))]])
+          (empty? (:res m)) (do-draw (hash-map :seq new-seq
+                                               :line new-line
+                                               :dir new-dir
+                                               :res [[(str (first (:seq m)))]]))
           :else (do-draw (hash-map :seq new-seq
                                    :line new-line
                                    :dir new-dir
@@ -88,7 +87,7 @@
   (let [line '(0 1 2 1 0 -1 -1 1 2 3 4 5 6 5 4 3)
         seq (seq-squares-* n m)
         length (count seq)
-        dir (take length direction)]
+        dir (take length (direction))]
     (cond (= n m) [(clojure.string/join (map str (int2l n)))]
           :else (do-draw {:res nil
                           :dir dir
