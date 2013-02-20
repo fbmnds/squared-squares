@@ -59,11 +59,11 @@
         curr-dir (first (:dir m))
         curr-res (:res m)]
     (cond (empty? curr-res) [[item]]
-          (< curr-line 0) (cons [item] curr-res)
+          (< curr-line 0) (vec (cons [item] curr-res))
           (< curr-line (count curr-res))
           (if (= curr-dir 0)
             (assoc-in curr-res [curr-line]
-                      (conj (curr-res curr-line) [item]))
+                      (conj (curr-res curr-line) item))
             (assoc-in curr-res [curr-line]
                       (vec (concat [item] (curr-res curr-line)))))
           :else (conj curr-res [item]))))
