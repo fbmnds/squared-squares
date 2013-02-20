@@ -87,7 +87,7 @@
   (let [line '(0 1 2 1 0 -1 -1 1 2 3 4 5 6 5 4 3)
         seq (seq-squares-* n m)
         length (count seq)
-        dir (take length (direction))]
+        dir '(0 0 0 1 1 1 1 0 0 0 0 0)]
     (cond (= n m) [(clojure.string/join (map str (int2l n)))]
           :else (do-draw {:res nil
                           :dir dir
