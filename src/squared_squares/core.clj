@@ -1,4 +1,4 @@
-;(ns squared-squares.core)
+(ns squared-squares.core)
 
 ;; Create a function of two integer arguments: the start and end, respectively.
 ;; You must create a vector of strings which renders a 45° rotated square of integers
@@ -51,7 +51,7 @@
     (if (in? sq n) n (first (filter #(< n %) sq)))))
 
 
-;; res = [[1][2 4][1 6 *][* *][*]]
+;; e.g., res = [["6"] ["5" "*"] ["2" "2" "*"] ["6" "4"] ["1"]]
 ;;
 (defn do-res [m]
   (let [item (first (:seq m))
@@ -68,20 +68,28 @@
                       (vec (concat [item] (curr-res curr-line)))))
           :else (conj curr-res [item]))))
 
-(defn do-draw [m]
-  (println m)
+(defn do-prepare [m]
   (let [new-seq (drop 1 (:seq m))
         new-line (drop 1 (:line m))
         new-dir (drop 1 (:dir m))]
     (cond (empty? (:seq m)) (:res m)
-          (empty? (:res m)) (do-draw (hash-map :seq new-seq
-                                               :line new-line
-                                               :dir new-dir
-                                               :res [[(str (first (:seq m)))]]))
-          :else (do-draw (hash-map :seq new-seq
-                                   :line new-line
-                                   :dir new-dir
-                                   :res (do-res m))))))
+          (empty? (:res m)) (do-prepare (hash-map :seq new-seq
+                                                  :line new-line
+                                                  :dir new-dir
+                                                  :res [[(str (first (:seq m)))]]))
+          :else (do-prepare (hash-map :seq new-seq
+                                      :line new-line
+                                      :dir new-dir
+                                      :res (do-res m))))))
+
+;; e.g., v = [["6"] ["5" "*"] ["2" "2" "*"] ["6" "4"] ["1"]]
+;;
+(defn do-draw [v]
+  (let [length (count v)]
+    (vec (for [i v :let [pad (clojure.string/join (take (/ (dec (- length (count i))) 2)
+                                                        (repeat \space)))]]
+           (clojure.string/join
+            [pad (clojure.string/join \space i) pad])))))
 
 (defn sqsq [n m]
   (let [line '(0 1 2 1 0 -1 -1 1 2 3 4 5 6 5 4 3)
@@ -89,7 +97,7 @@
         length (count seq)
         dir '(0 0 0 1 1 1 1 0 0 0 0 0)]
     (cond (= n m) [(clojure.string/join (map str (int2l n)))]
-          :else (do-draw {:res nil
+          :else (do-draw (do-prepare {:res nil
                           :dir dir
                           :line line
-                          :seq seq}))))
+                          :seq seq})))))
